@@ -1,5 +1,6 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
+import {initializeApp} from "firebase/app";
+import {getFirestore, collection, getDocs} from 'firebase/firestore/lite';
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyBT6ok2qz8iOy7Hwyiu2Iwp-xVkRsarxkU",
@@ -14,4 +15,9 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
-
+export const getFavorites = async () => {
+    const favoritesCol = collection(db, 'favorites')
+    const favoriteSnapshot = await getDocs(favoritesCol)
+    const favoriteList = favoriteSnapshot.docs.map(doc => doc.data())
+    return favoriteList
+}
