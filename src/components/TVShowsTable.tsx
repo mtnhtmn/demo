@@ -1,20 +1,25 @@
 import * as React from 'react';
 import {DataGrid, GridColDef} from "@mui/x-data-grid";
 import {useAppDispatch, useAppSelector} from "../store/hooks";
-import {useEffect} from "react";
-import {fetchMovies} from "../store/slices/movieSlice";
+import {useEffect, useState} from "react";
+import {addToFavorites, fetchTvShows} from "../store/slices/movieSlice";
+import {Button} from "@mui/material";
+import {useNavigate} from "react-router-dom";
 
 
 export default function TVShowsTable() {
 
-    const Movies = useAppSelector((state) => state.moviesReducer.movies)
+    const movies = useAppSelector((state) => state.moviesReducer.tvShows)
     const dispatch = useAppDispatch()
+    const navigate = useNavigate()
+    const [showFavoriteButton, setShowFavoriteButton] = useState(false)
+    const [selectedFavorite, setSelectedFavorites] = useState<number[]>([])
 
     useEffect(() => {
-        dispatch(fetchMovies())
+        dispatch(fetchTvShows())
     }, [])
 
-    const rows = Movies.map((tvShow: any) => {
+    const rows = movies.map((tvShow: any) => {
         return {
             id: tvShow.id,
             showName: tvShow.name,
@@ -24,27 +29,27 @@ export default function TVShowsTable() {
         }
     })
 
-    console.log(Movies)
+    console.log(movies)
 
     const columns: GridColDef[] = [
         {field: 'id', headerName: 'ID', width: 90},
         {
-            field: 'show',
+            field: 'showName',
             headerName: 'Show Name',
-            width: 150,
+            width: 250,
             editable: true,
         },
         {
             field: 'airDate',
             headerName: 'Air Date',
-            width: 150,
+            width: 100,
             editable: true,
         },
         {
             field: 'rating',
             headerName: 'Rating',
             type: 'number',
-            width: 110,
+            width: 90,
             editable: true,
         },
         {
@@ -57,14 +62,31 @@ export default function TVShowsTable() {
     ];
 
     return (
-        <div style={{height: 800, width: '100%'}}>
+        <div style={{height: 700, width: '100%'}}>
             <DataGrid
                 rows={rows}
                 columns={columns}
                 pageSize={10}
                 checkboxSelection
-                disableSelectionOnClick
+                onSelectionModelChange={(selectionModel)=>{
+                    setSelectedFavorites(selectionModel as number[])
+                    if (selectionModel.length === 0) {
+                        setShowFavoriteButton(false)
+                    } else if (selectionModel.length === 1 || selectionModel.length === rows.length) {
+                        setShowFavoriteButton(true)
+                    }
+                }}
             />
+            {showFavoriteButton ? <Button onClick={() => {
+                dispatch(addToFavorites(selectedFavorite))
+            }}>
+                Add to favorites
+            </Button> : null}
+            <Button onClick={() => {
+                navigate('favorites')
+            }}>
+                Favorites
+            </Button>
         </div>
     );
 }
