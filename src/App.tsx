@@ -1,26 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect, useState} from 'react';
+import TVShowsTable from "./components/TVShowsTable";
+import {Provider} from "react-redux";
+import {store} from "./store/store";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => {
+    const [tvShows, setTvShows] = useState([])
+
+    const getTVShows = () => {
+        fetch('https://api.tvmaze.com/schedule/web?date=2020-05-29&country=US')
+            .then(response => response.json())
+            .then(response => {
+                setTvShows(response)
+            })
+            .catch(err => console.error(err));
+    }
+
+    useEffect(() => {
+        getTVShows()
+    }, [])
+
+    return (
+        <div>
+            <Provider store={store}>
+                <TVShowsTable tvShows={tvShows}/>
+            </Provider>
+        </div>
+    );
+};
 
 export default App;
