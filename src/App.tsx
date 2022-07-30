@@ -2,29 +2,20 @@ import React, {useEffect, useState} from 'react';
 import TVShowsTable from "./components/TVShowsTable";
 import {Provider} from "react-redux";
 import {store} from "./store/store";
+import {BrowserRouter, Routes, Route} from "react-router-dom";
+import Favorites from "./components/Favorites";
 
 const App = () => {
-    const [tvShows, setTvShows] = useState([])
-
-    const getTVShows = () => {
-        fetch('https://api.tvmaze.com/schedule/web?date=2020-05-29&country=US')
-            .then(response => response.json())
-            .then(response => {
-                setTvShows(response)
-            })
-            .catch(err => console.error(err));
-    }
-
-    useEffect(() => {
-        getTVShows()
-    }, [])
 
     return (
-        <div>
+        <BrowserRouter>
             <Provider store={store}>
-                <TVShowsTable tvShows={tvShows}/>
+                <Routes>
+                    <Route path="/" element={<TVShowsTable/>}/>
+                    <Route path="favorites" element={<Favorites/>}/>
+                </Routes>
             </Provider>
-        </div>
+        </BrowserRouter>
     );
 };
 
